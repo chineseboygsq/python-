@@ -1,0 +1,17 @@
+# 将缺失值按分组平均填充
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({'code':[1,2,3,4,5,6,7,8],
+                   'value':[np.nan,5,7,8,9,10,11,12],                   
+                   'value2':[5,np.nan,7,np.nan,9,10,11,12],
+                   'indstry':['农业1','农业1','农业1','农业2','农业2','农业4','农业2','农业3']},
+                    columns=['code','value','value2','indstry'],
+                    index=list('ABCDEFGH')
+dfm = df.groupby('indstry').mean()[['value','value2']]
+cols = ['value','value2']
+for col in cols:
+    names = list(df.loc[pd.isnull(df)[col],'indstry'])
+    t = dfm.loc[names,col]
+    t.index = df[pd.isnull(df)[col]].index
+    df.loc[pd.isnull(df)[col],col] = t
